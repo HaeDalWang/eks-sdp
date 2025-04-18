@@ -42,7 +42,7 @@ module "eks" {
 
   vpc_id = module.vpc.vpc_id
   # 노드그룹을 사용할 경우 노드가 생성되는 서브넷
-  subnet_ids = concat(module.vpc.private_subnets,[aws_subnet.new_private_subnet_a.id])
+  subnet_ids = concat(module.vpc.private_subnets,[aws_subnet.new_private_subnet_a.id],[aws_subnet.new_private_subnet_c.id])
   # 컨트롤 플레인으로 연결된 ENI를 생성할 서브넷
   control_plane_subnet_ids = module.vpc.intra_subnets
 

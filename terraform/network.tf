@@ -31,6 +31,10 @@ module "vpc" {
     # Karpenter가 노드를 생성할 서브넷에 요구되는 태그
     "karpenter.sh/discovery" = local.project
   }
+
+  secondary_cidr_blocks = [
+    "10.122.0.0/16"  # 원하는 보조 CIDR 블록을 추가 작성
+  ]
 }
 
 ## EKS IP 부족 시 해결하기 위한 방법
@@ -45,8 +49,28 @@ resource "aws_subnet" "new_private_subnet_a" {
     "karpenter.sh/discovery" = local.project
   }
 }
+
 # 새로운 서브넷에 대한 라우팅 테이블을 업데이트
 resource "aws_route_table_association" "new_private_subnet_route" {
   subnet_id      = aws_subnet.new_private_subnet_a.id
+  route_table_id = module.vpc.private_route_table_ids[0] # VPC 모듈에서 반환된 첫 번째 라우팅 테이블 사용
+}
+
+
+# 새로운 세컨더리 VPC 범위에 서브넷
+resource "aws_subnet" "new_private_subnet_c" {
+  vpc_id            = module.vpc.vpc_id
+  cidr_block        = "10.122.1.0/24"
+  availability_zone = "ap-northeast-2c"
+
+  tags = {
+    "kubernetes.io/role/internal-elb" = 1
+    "karpenter.sh/discovery" = local.project
+  }
+}
+
+# 새로운 서브넷에 대한 라우팅 테이블을 업데이트
+resource "aws_route_table_association" "new_private_subnet_route_c" {
+  subnet_id      = aws_subnet.new_private_subnet_c.id
   route_table_id = module.vpc.private_route_table_ids[0] # VPC 모듈에서 반환된 첫 번째 라우팅 테이블 사용
 }
