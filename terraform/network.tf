@@ -32,3 +32,21 @@ module "vpc" {
     "karpenter.sh/discovery" = local.project
   }
 }
+
+## EKS IP 부족 시 해결하기 위한 방법
+# EKS 클러스터에 연결할 새로운 범위에 VPC 서브넷
+resource "aws_subnet" "new_private_subnet_a" {
+  vpc_id            = module.vpc.vpc_id
+  cidr_block        = "10.240.150.0/24"
+  availability_zone = "ap-northeast-2a"
+
+  tags = {
+    "kubernetes.io/role/internal-elb" = 1
+    "karpenter.sh/discovery" = local.project
+  }
+}
+# 새로운 서브넷에 대한 라우팅 테이블을 업데이트
+resource "aws_route_table_association" "new_private_subnet_route" {
+  subnet_id      = aws_subnet.new_private_subnet_a.id
+  route_table_id = module.vpc.private_route_table_ids[0] # VPC 모듈에서 반환된 첫 번째 라우팅 테이블 사용
+}

@@ -54,3 +54,7 @@ variable "k8tz_chart_version" {
   type        = string
 }
 
+variable "eks_node_ami_alias" {
+  description = "EKS 노드 AMI alias"
+  type        = string
+}

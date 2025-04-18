@@ -42,7 +42,7 @@ module "eks" {
 
   vpc_id = module.vpc.vpc_id
   # 노드그룹을 사용할 경우 노드가 생성되는 서브넷
-  subnet_ids = module.vpc.private_subnets
+  subnet_ids = concat(module.vpc.private_subnets,[aws_subnet.new_private_subnet_a.id])
   # 컨트롤 플레인으로 연결된 ENI를 생성할 서브넷
   control_plane_subnet_ids = module.vpc.intra_subnets
 
@@ -130,6 +130,7 @@ resource "helm_release" "karpenter" {
 
   skip_crds = true
 
+  # fargate에 배포 가능하도록 toleration 추가
   values = [
     <<-EOT
     settings:
@@ -142,7 +143,12 @@ resource "helm_release" "karpenter" {
       annotations:
         eks.amazonaws.com/role-arn: ${module.karpenter.iam_role_arn}
     serviceMonitor:
-      enabled: true
+      enabled: false
+    tolerations:
+    - key: "eks.amazonaws.com/compute-type"
+      operator: "Equal"
+      value: "fargate"
+      effect: "NoSchedule"
     EOT
   ]
 }
@@ -157,8 +163,7 @@ resource "kubectl_manifest" "karpenter_basic_node_class" {
     spec:
       amiFamily: AL2023
       amiSelectorTerms:
-      # - id: "${var.eks_node_ami_id}"
-      - alias: al2023@v20250410
+      - alias: "${var.eks_node_ami_alias}"
       role: ${module.karpenter.node_iam_role_name}
       subnetSelectorTerms:
       - tags:
