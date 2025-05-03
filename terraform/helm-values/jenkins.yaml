@@ -1,0 +1,19 @@
+# jenkins helm chart values
+# ingress는 ingress-nginx-controller로 설정
+controller:
+  additionalPlugins:
+  # - matrix-auth:3.1.6
+  # - amazon-ecr:1.114.vfd22430621f5
+  # - gitlab-branch-source:645.v62a_b_6fce8659
+  # - job-dsl:1.83
+  # - pipeline-aws:1.43
+  # - docker-workflow:563.vd5d2e5c4007f
+  # - pipeline-utility-steps:2.15.1
+  installLatestPlugins: false
+  overwritePlugins: true
+  jenkinsUrlProtocol: https
+  ingress:
+    enabled: true
+    apiVersion: networking.k8s.io/v1
+    hostName: jenkins.seungdobae.com
+    ingressClassName: nginx

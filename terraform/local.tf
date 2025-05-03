@@ -1,7 +1,7 @@
 # 로컬 환경변수 지정
 locals {
   project             = "eks-sdp"
-  service_domain_name = "${var.domain_name}"
+  service_domain_name = var.domain_name
   tags                = {}
 }
 

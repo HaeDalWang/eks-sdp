@@ -1,0 +1,5 @@
+# https://artifacthub.io/packages/helm/stakater/reloader
+# https://github.com/stakater/Reloader/blob/ee12df2b32f7c22500c25eaef9a6424dd531292b/deployments/kubernetes/chart/reloader/values.yaml#L4
+reloader:
+  autoReloadAll: true
+  namespaceSelector: kubernetes.io/metadata.name=intgapp

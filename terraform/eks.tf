@@ -42,7 +42,7 @@ module "eks" {
 
   vpc_id = module.vpc.vpc_id
   # 노드그룹을 사용할 경우 노드가 생성되는 서브넷
-  subnet_ids = concat(module.vpc.private_subnets,[aws_subnet.new_private_subnet_a.id],[aws_subnet.new_private_subnet_c.id])
+  subnet_ids = concat(module.vpc.private_subnets, [aws_subnet.new_private_subnet_a.id], [aws_subnet.new_private_subnet_c.id])
   # 컨트롤 플레인으로 연결된 ENI를 생성할 서브넷
   control_plane_subnet_ids = module.vpc.intra_subnets
 
@@ -53,7 +53,7 @@ module "eks" {
   create_node_security_group = false
 
   cluster_endpoint_private_access = true
-  cluster_endpoint_public_access = true
+  cluster_endpoint_public_access  = true
 
   fargate_profiles = {
     # Karpenter를 Fargate에 실행
@@ -110,23 +110,28 @@ resource "kubernetes_namespace" "karpenter" {
 
 # Karpenter
 resource "helm_release" "karpenter-crd" {
-  name       = "karpenter-crd"
-  repository = "oci://public.ecr.aws/karpenter"
+  name                = "karpenter-crd"
+  repository          = "oci://public.ecr.aws/karpenter"
   repository_username = data.aws_ecrpublic_authorization_token.token.user_name
   repository_password = data.aws_ecrpublic_authorization_token.token.password
-  chart      = "karpenter-crd"
-  version    = var.karpenter_chart_version
-  namespace  = kubernetes_namespace.karpenter.metadata[0].name
+  chart               = "karpenter-crd"
+  version             = var.karpenter_chart_version
+  namespace           = kubernetes_namespace.karpenter.metadata[0].name
+  lifecycle {
+    ignore_changes = [
+      repository_password
+    ]
+  }
 }
 
 resource "helm_release" "karpenter" {
-  name       = "karpenter"
-  repository = "oci://public.ecr.aws/karpenter"
+  name                = "karpenter"
+  repository          = "oci://public.ecr.aws/karpenter"
   repository_username = data.aws_ecrpublic_authorization_token.token.user_name
   repository_password = data.aws_ecrpublic_authorization_token.token.password
-  chart      = "karpenter"
-  version    = var.karpenter_chart_version
-  namespace  = kubernetes_namespace.karpenter.metadata[0].name
+  chart               = "karpenter"
+  version             = var.karpenter_chart_version
+  namespace           = kubernetes_namespace.karpenter.metadata[0].name
 
   skip_crds = true
 
@@ -151,6 +156,11 @@ resource "helm_release" "karpenter" {
       effect: "NoSchedule"
     EOT
   ]
+  lifecycle {
+    ignore_changes = [
+      repository_password
+    ]
+  }
 }
 
 ## NodeClass

@@ -6,9 +6,9 @@ module "vpc" {
   name = local.project
   cidr = var.vpc_cidr
 
-  azs              = data.aws_availability_zones.azs.names
-  public_subnets   = [for idx, _ in data.aws_availability_zones.azs.names : cidrsubnet(var.vpc_cidr, 8, idx)]
-  private_subnets  = [for idx, _ in data.aws_availability_zones.azs.names : cidrsubnet(var.vpc_cidr, 8, idx + 10)]
+  azs             = data.aws_availability_zones.azs.names
+  public_subnets  = [for idx, _ in data.aws_availability_zones.azs.names : cidrsubnet(var.vpc_cidr, 8, idx)]
+  private_subnets = [for idx, _ in data.aws_availability_zones.azs.names : cidrsubnet(var.vpc_cidr, 8, idx + 10)]
 
   default_security_group_egress = [
     {
@@ -33,7 +33,7 @@ module "vpc" {
   }
 
   secondary_cidr_blocks = [
-    "10.122.0.0/16"  # 원하는 보조 CIDR 블록을 추가 작성
+    "10.122.0.0/16" # 원하는 보조 CIDR 블록을 추가 작성
   ]
 }
 
@@ -46,7 +46,7 @@ resource "aws_subnet" "new_private_subnet_a" {
 
   tags = {
     "kubernetes.io/role/internal-elb" = 1
-    "karpenter.sh/discovery" = local.project
+    "karpenter.sh/discovery"          = local.project
   }
 }
 
@@ -65,7 +65,7 @@ resource "aws_subnet" "new_private_subnet_c" {
 
   tags = {
     "kubernetes.io/role/internal-elb" = 1
-    "karpenter.sh/discovery" = local.project
+    "karpenter.sh/discovery"          = local.project
   }
 }
 

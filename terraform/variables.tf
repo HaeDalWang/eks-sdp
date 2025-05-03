@@ -58,3 +58,23 @@ variable "eks_node_ami_alias" {
   description = "EKS 노드 AMI alias"
   type        = string
 }
+
+variable "jenkins_version" {
+  description = "Jenkins Helm 차트 버전"
+  type        = string
+}
+
+variable "reloader_chart_version" {
+  description = "Reloader Helm 차트 버전"
+  type        = string
+}
+
+variable "secrets_store_csi_driver_chart_version" {
+  description = "Secrets Store CSI Driver Helm 차트 버전"
+  type        = string
+}
+
+variable "secrets_store_csi_driver_provider_aws_chart_version" {
+  description = "Secrets Store CSI Driver Provider AWS Helm 차트 버전"
+  type        = string
+}
