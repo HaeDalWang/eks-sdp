@@ -110,28 +110,21 @@ resource "kubernetes_namespace" "karpenter" {
 
 # Karpenter
 resource "helm_release" "karpenter-crd" {
-  name                = "karpenter-crd"
-  repository          = "oci://public.ecr.aws/karpenter"
-  repository_username = data.aws_ecrpublic_authorization_token.token.user_name
-  repository_password = data.aws_ecrpublic_authorization_token.token.password
-  chart               = "karpenter-crd"
-  version             = var.karpenter_chart_version
-  namespace           = kubernetes_namespace.karpenter.metadata[0].name
-  lifecycle {
-    ignore_changes = [
-      repository_password
-    ]
-  }
+  name = "karpenter-crd"
+  # repository = "oci://public.ecr.aws/karpenter"
+  chart     = "oci://public.ecr.aws/karpenter/karpenter-crd"
+  version   = var.karpenter_chart_version
+  namespace = kubernetes_namespace.karpenter.metadata[0].name
 }
 
 resource "helm_release" "karpenter" {
-  name                = "karpenter"
-  repository          = "oci://public.ecr.aws/karpenter"
-  repository_username = data.aws_ecrpublic_authorization_token.token.user_name
-  repository_password = data.aws_ecrpublic_authorization_token.token.password
-  chart               = "karpenter"
-  version             = var.karpenter_chart_version
-  namespace           = kubernetes_namespace.karpenter.metadata[0].name
+  name       = "karpenter"
+  repository = "oci://public.ecr.aws/karpenter"
+  # repository_username = data.aws_ecrpublic_authorization_token.token.user_name
+  # repository_password = data.aws_ecrpublic_authorization_token.token.password
+  chart     = "oci://public.ecr.aws/karpenter/karpenter"
+  version   = var.karpenter_chart_version
+  namespace = kubernetes_namespace.karpenter.metadata[0].name
 
   skip_crds = true
 
@@ -156,11 +149,6 @@ resource "helm_release" "karpenter" {
       effect: "NoSchedule"
     EOT
   ]
-  lifecycle {
-    ignore_changes = [
-      repository_password
-    ]
-  }
 }
 
 ## NodeClass
